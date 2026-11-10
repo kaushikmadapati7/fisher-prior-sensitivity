@@ -1,0 +1,29 @@
+# Clinical data and anything derived from it never enters this repo.
+# Manifests embed case identifiers; runs/ holds per-case audit output.
+manifests*/
+runs/
+*.nii
+*.nii.gz
+*.tar
+*.dcm
+header_cache.json
+# scratch
+__pycache__/
+*.pyc
+.DS_Store
+
+# LaTeX build products
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/ml4ps_2026.pdf
+# fig_leak.pdf is a source asset, not a build product: the paper does not compile without it,
+# and a branch switch that untracks it silently breaks the build.
+!paper/fig_leak.pdf
+
+# LaTeX build products
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.pdf
+data/
