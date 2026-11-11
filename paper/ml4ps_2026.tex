@@ -68,9 +68,9 @@
 fitted MRI parameter comes from the prior}
 % DOUBLE-BLIND: author block stays commented until camera-ready.
 \author{%
-  Kaushik Madapati\thanks{Also at College of Engineering, University of California, Berkeley.},
-  \ Jie Bao, \ Yang Yang, \ Kang Wang, \ Hanxue Gu \\
-  University of California, San Francisco
+  Kaushik Madapati, \ Jie Bao, \ Yang Yang, \ Kang Wang, \ Hanxue Gu \\
+  University of California, San Francisco \\
+  {\small Kaushik Madapati is also at the College of Engineering, University of California, Berkeley.}
 }
 \date{}
 
@@ -260,10 +260,8 @@ shrink as the noise does. On the median protocol the dropped term is $0.14\%$ of
 the wrong scale: along $v$ the data contributes no curvature, so the comparison is against
 $\lambda$, and there $v^\top C v / \lambda = 0.655$. It moves the predicted $T_1$ leak from $0.941$
 to $0.547$, the sensitivity derived in Section~2 \claim{C49}. Recomputing with the exact curvature brings all three ratios to within
-$6\%$ of $1$: $1.061$, $0.963$ and $1.018$ for PD, $T_1$ and $T_2$ \claim{C20}. The displacement
-is differenced one-sidedly at the $1.25\times$ shift, which carries an $O(\Delta)$ error.
-Differencing centrally gives $1.011$, $1.012$ and $1.001$ \claim{C109}, so most of what remains
-after the correction is the estimator. The two do not chain: $0.941$ and $0.547$ are one protocol's,
+$6\%$ of $1$: $1.061$, $0.963$ and $1.018$ for PD, $T_1$ and $T_2$ \claim{C20}. Differencing centrally rather than one-sidedly, which removes an
+$O(\Delta)$ error at this shift, gives $1.011$, $1.012$ and $1.001$ \claim{C109}. The two do not chain: $0.941$ and $0.547$ are one protocol's,
 the ratios medians over 4{,}608. It holds per exam,
 the corrected $T_1$ ratio spanning $0.934$ to $2.3$ across the 5th to 95th percentiles
 \claim{C43}. It holds across experiments too: dropping measurements moves the Fisher ratio across $0.147$
@@ -282,58 +280,47 @@ $0.960$ and $1.009$ against $1.061$, $0.963$ and $1.018$) and leaves $D$ at $1.0
 \section{Discussion}
 
 Fisher information answers a design question: what an acquisition can tell you about each
-parameter, before any patient is scanned. For that $F$ is exact rather than approximate, follows
-from TR, TE and $b$ alone, and is positive semidefinite by construction, while $H$'s residual
-arrives only with the images and a completed fit and is indefinite when residuals are large. For
-protocol design, $F$ is right and $H$ is unavailable.
+parameter, before any patient is scanned. For that $F$ is exact, follows from TR, TE and $b$ alone,
+and is positive semidefinite by construction, while $H$'s residual arrives only with the images
+and a completed fit.
 
 The leak matrix asks something else: how far the prior moves the estimate once a parameter
-is unidentifiable. Two arguments carry $F$ across that gap. The first is that the
-dropped term is proportional to the residuals and vanishes for a perfect fit
-\cite[Prop.~2]{kunstner2019}, \cite{transtrum2011} (whose target is the \emph{empirical} Fisher
-matrix; with Gaussian noise ours is the true one). It is small, but a small term in a nearly
-singular matrix can still have a large effect. The second is that the approximation holds
-whenever the model manifold has small curvature \cite{transtrum2012}. That bounds \emph{extrinsic}
-curvature, and ours is zero: the Jacobian has full row rank, so the manifold has no normal
-direction \claim{C22}. What is left is parameter-effects curvature, removable by a change of
-coordinates in general but not here, since the coordinates cannot change without changing the
-prior.
+is unidentifiable. Two arguments carry $F$ across that gap. The first is that the dropped term is
+proportional to the residuals and vanishes for a perfect fit \cite[Prop.~2]{kunstner2019},
+\cite{transtrum2011}; it is small, but a small term in a nearly singular matrix can still have a
+large effect. The second is that the approximation holds
+whenever the model manifold has small curvature \cite{transtrum2012}. That bounds \emph{extrinsic} curvature, and ours is zero:
+the Jacobian has full row rank, so the manifold has no normal direction \claim{C22}. What is
+left is parameter-effects curvature, removable by a change of coordinates in general but not
+here, since the coordinates cannot change without changing the prior.
 
-\paragraph{Learned estimators.} The leak matrix describes a per-exam optimisation, and an
-amortised network never solves one. The direction $v$ survives the change of estimator: it is a
-property of the acquisition, and no estimator recovers what three measurements do not determine.
-A MAP fit fills that direction from the prior, by the fraction $M_{jj}$. A network's objective
-fills it with nothing, so whatever fills it comes from the training run. Self-supervised
-physics-guided reconstruction \cite{vanlune2026} minimises the same objective and needs no
-reference maps, so this runs on these images. We train five networks differing only in random
-seed and split each pair's disagreement on held-out exams along $v$ and across it. Over $80$
-exams held out of $292$ the disagreement is $2.28$ times larger along $v$, $0.078$ log units
+\paragraph{Learned estimators.} The leak matrix describes a per-exam optimisation that an
+amortised network never solves, but $v$ is a property of the acquisition and survives the change
+of estimator. A MAP fit fills it from the prior, by the fraction $M_{jj}$; a network's objective
+fills it with nothing, so whatever fills it comes from the training run. Self-supervised physics-guided reconstruction
+\cite{vanlune2026} minimises the same objective and needs no reference maps. We train five
+networks differing only in random seed and split each pair's disagreement along $v$ and across
+it. Over $80$ exams held out of $292$ the disagreement is $2.28$ times larger along $v$, $0.078$ log units
 against $0.034$, with $88.8\%$ of exams following that ordering \claim{C97}; three further
 configurations give $3.02$ to $3.19$
-\claim{C72}. In the parameter this is an $8.1\%$ difference between two runs of one architecture
-on one dataset, the comparison that matches how these methods are deployed. The direction it falls in follows from TR, TE and $b$ before any network is
-trained. The comparison is not normalised per dimension and has no matched control, so it carries
-the ordering and not the size.
+\claim{C72}. In the parameter this is an $8.1\%$ difference between two runs of one
+architecture on one dataset. The comparison is not normalised per dimension and has no matched
+control, so it carries the ordering and not the size.
 
-\paragraph{Limitations.} The leak is defined relative to a parametrization. We fit log parameters, in
-which the prior is round; fitting $T_1$ and $T_2$ directly, or their inverses $R_1$ and $R_2$,
-would give a different prior and a different leak, and we have not measured how much of the
-$0.62$ to $0.71$ follows from that choice. Per-voxel noise is unmeasurable on registered clinical
-volumes, so $\sigma = 0.05$ is set rather than estimated, though the parameter ordering survives
-a $625\times$ sweep of the between-contrast weighting \claim{C8}. All five instruments we compare are one
-vendor's \claim{C15}, and unmodelled physics such as magnetization transfer remains a live account
-of part of the residual \claim{C16}. A paired cohort on two machines would test the harmonization
-claim directly; ours failed its identity control \claim{C12}.
+\paragraph{Limitations.} The leak is defined relative to a parametrization. We fit log
+parameters, in which the prior is round; fitting $T_1$ and $T_2$ directly would give a different prior and a different leak, and we
+have not measured how much of the $0.62$ to $0.71$ follows from that choice. Per-voxel noise is unmeasurable here, so $\sigma = 0.05$ is
+set rather than estimated, though the ordering survives a $625\times$ sweep of the
+between-contrast weighting \claim{C8}. All five instruments are one vendor's \claim{C15}, and
+magnetization transfer remains a live account of part of the residual \claim{C16}.
 
 %======================================================================
 \section{Conclusion}
 
-The prior's contribution to a fitted MRI parameter is a bias with a closed form. Fisher information
-predicts it too large, by 29--38\% over 4{,}608 exams, by amounts that differ across scanners, and
-with the exam ordering largely lost. Restoring the discarded curvature term recovers most of it. The measurement
-transfers to any underdetermined least-squares fit closed by a prior: take the Fisher matrix's
-near-null direction $v$, compare $v^\top C v$ against $\lambda$ rather than against $\|F\|$, and
-correct the leak when it is not small. Nothing in that procedure is specific to MRI.
+The prior's contribution to a fitted MRI parameter is a bias with a closed form, and restoring
+the discarded curvature term recovers most of it. The procedure transfers to any underdetermined
+least-squares fit closed by a prior: compare $v^\top C v$ against $\lambda$ rather than against
+$\|F\|$, and correct the leak when it is not small.
 
 \bibliographystyle{plain}
 \begin{thebibliography}{9}
