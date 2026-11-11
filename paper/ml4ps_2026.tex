@@ -23,21 +23,28 @@
 % Every \todo marks something unwritten or unmeasured. Every number traces to paper/CLAIMS.md.
 \documentclass{article}
 
-% NeurIPS 2026 style, UNMODIFIED, as the guidelines require. `dblblindworkshop` is the option
-% for a double-blind workshop, which is ML4PS: it keeps the author block anonymous and routes
-% the workshop title into the footer for camera-ready.
-\usepackage[dblblindworkshop]{neurips_2026}
+% NeurIPS 2026 style, UNMODIFIED, as the guidelines require. `dblblindworkshop` routes the
+% workshop title into the footer and, on its own, keeps the author block anonymous. `final`
+% is what deanonymises: it sets \@anonymousfalse and replaces the submission footer
+% ("Submitted to ... Do not distribute.") with the workshop track line. Drop `final` to get
+% the submission form back.
+\usepackage[dblblindworkshop,final]{neurips_2026}
 \workshoptitle{Machine Learning and the Physical Sciences}
 
 % The workshop mandates an exact footer string that differs from the style file's default
 % ("Submitted to 40th Conference on Neural Information Processing Systems..."). This overrides
 % it from the DOCUMENT, which leaves neurips_2026.sty untouched -- the guidelines prohibit
 % modifying the template, and they also require this string, so it has to be done here.
+% The string below is the one the CFP mandates for SUBMISSION. Under `final` it would be
+% wrong on a published paper, so the override is skipped and the template's own workshop
+% track line is used instead.
 \makeatletter
-\renewcommand{\@noticestring}{%
-  Submitted to the 9th Workshop on Machine Learning and the Physical Sciences (ML4PS 2026).
-  Do not distribute.%
-}
+\if@neuripsfinal\else
+  \renewcommand{\@noticestring}{%
+    Submitted to the 9th Workshop on Machine Learning and the Physical Sciences (ML4PS 2026).
+    Do not distribute.%
+  }
+\fi
 \makeatother
 
 \usepackage{amsmath,amssymb,booktabs,graphicx,xcolor}
@@ -60,7 +67,11 @@
 \title{Fisher information over-predicts how much of a\\
 fitted MRI parameter comes from the prior}
 % DOUBLE-BLIND: author block stays commented until camera-ready.
-% \author{...}
+\author{%
+  Kaushik Madapati\thanks{Also at College of Engineering, University of California, Berkeley.},
+  \ Jie Bao, \ Yang Yang, \ Kang Wang, \ Hanxue Gu \\
+  University of California, San Francisco
+}
 \date{}
 
 \begin{document}
